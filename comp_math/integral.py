@@ -11,7 +11,7 @@ def oscil(x):
 
 class Integral:
 
-    def __init__(self, domain, function, intervals=100000):
+    def __init__(self, domain, function, intervals=20):
         assert(len(domain) == 2)
         assert(domain[0] < domain[1])
         assert(type(function(1) == int))
@@ -22,9 +22,10 @@ class Integral:
         self._y = [function(xi) for xi in self._x]
         self._n = intervals
 
-    def plot(self):
-        plt.plot(self._x, self._y)
-        plt.show()
+    def plot(self, show = True, linestyle="solid"):
+        plt.plot(self._x, self._y, linestyle=linestyle)
+        if show:
+            plt.show()
 
     def midpoint(self):
         est = [[self._x[t], self._x[t+1]] for t in range(0, self._n)]
@@ -47,7 +48,17 @@ class Integral:
         pass
 
     def plot_mid(self):
-        pass
+        Integral.plot(self, show=False, linestyle='dashed')
+        offset = (self._x[1] - self._x[0]) / 2
+        points = [x + offset for x in self._x[:-1]]
+        est_y = [self._f(p) for p in points]
+        plt.plot()
+        for i in range(0,self._n):
+            plt.plot([self._x[i], self._x[i+1]], [est_y[i], est_y[i]], c="red")
+            plt.plot([self._x[i], self._x[i]], [est_y[i], 0], c='red')
+            plt.plot([self._x[i + 1], self._x[i + 1]], [est_y[i], 0], c='red')
+        plt.show()
+
 
     def plot_trap(self):
         pass
@@ -165,25 +176,10 @@ class Integral:
 #
 
 def main():
-    # per wolfram alpha
-    ans = "-0.1327641442003012340629343548846822855690178761421423618114406160"
-    ans = float(ans)
-    mid_err = []
-    trap_err = []
-    simp_err = []
-    precision = list(range(0,7))
-    for i in precision:
-        j = Integral([0, 10], oscil, intervals=10 ** i)
-        mid_err.append(abs(ans-j.midpoint()))
-        trap_err.append(abs(ans-j.trapezoid()))
-        simp_err.append(abs(ans-j.simpson()))
-    plt.scatter(precision, mid_err, marker='x', c='r')
-    plt.scatter(precision, trap_err, marker='x', c='b')
-    plt.scatter(precision, simp_err, marker='x', c='g')
-    plt.yscale('log')
-    plt.ylim([10**-18,10**1])
-    plt.show()
+    x = Integral([0,10], oscil)
+    x.plot_mid()
 
+    pass
 
 if __name__ == "__main__":
     main()
